@@ -51,14 +51,33 @@ class TaskApp(App):
     def add_new_task(self, instance):
         task_text = self.input_field.text.strip()
         if task_text:
-            task_item = Label(
+            # تصميم صف لكل مهمة يحتوي على (النص + زر حذف)
+            task_row = BoxLayout(orientation='horizontal', size_hint_y=None, height=45, spacing=10)
+            
+            task_label = Label(
                 text=f"• {task_text}",
-                size_hint_y=None,
-                height=40,
+                size_hint_x=0.75,
                 font_size=16
             )
-            self.tasks_box.add_widget(task_item)
+            
+            delete_button = Button(
+                text="حذف",
+                size_hint_x=0.25,
+                background_color=(0.8, 0.1, 0.1, 1)
+            )
+            
+            # ربط زر الحذف بدالة الحذف الخاصة به
+            delete_button.bind(on_press=lambda x: self.delete_task(task_row))
+            
+            task_row.add_widget(task_label)
+            task_row.add_widget(delete_button)
+            
+            self.tasks_box.add_widget(task_row)
             self.input_field.text = ""
+
+    def delete_task(self, task_row):
+        # إزالة المهمة من القائمة
+        self.tasks_box.remove_widget(task_row)
 
 if __name__ == '__main__':
     TaskApp().run()
