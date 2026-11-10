@@ -41,10 +41,21 @@ jobs:
     - name: Bypass Android SDK Licenses
       run: |
         mkdir -p /home/runner/.buildozer/android/platform/android-sdk/licenses
-        # كتابة بصمات التراخيص المقبولة رسمياً لمنع ظهور شاشة الموافقة
         echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
         echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" >> /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
         echo -e "\nd56f5187479451eabf01fb78af6dfcb131a648fa" >> /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+
+    - name: Pre-install Android SDK Tools (Fix path error)
+      run: |
+        SDK_DIR="/home/runner/.buildozer/android/platform/android-sdk"
+        mkdir -p "$SDK_DIR/tools/bin"
+        if [ ! -f "$SDK_DIR/tools/bin/sdkmanager" ]; then
+          echo "Downloading and placing commandline tools..."
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O /tmp/cmdtools.zip
+          unzip -q /tmp/cmdtools.zip -d /tmp/cmdtools
+          cp -r /tmp/cmdtools/tools/* "$SDK_DIR/tools/"
+          rm -rf /tmp/cmdtools.zip /tmp/cmdtools
+        fi
 
     - name: Cache Buildozer directory
       uses: actions/cache@v3
