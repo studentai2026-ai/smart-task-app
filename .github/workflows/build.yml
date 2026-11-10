@@ -48,13 +48,14 @@ jobs:
     - name: Pre-install Android SDK Tools (Fix path error)
       run: |
         SDK_DIR="/home/runner/.buildozer/android/platform/android-sdk"
-        mkdir -p "$SDK_DIR/tools/bin"
+        mkdir -p "$SDK_DIR/tools"
         if [ ! -f "$SDK_DIR/tools/bin/sdkmanager" ]; then
           echo "Downloading and placing commandline tools..."
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O /tmp/cmdtools.zip
-          unzip -q /tmp/cmdtools.zip -d /tmp/cmdtools
-          cp -r /tmp/cmdtools/tools/* "$SDK_DIR/tools/"
-          rm -rf /tmp/cmdtools.zip /tmp/cmdtools
+          unzip -q /tmp/cmdtools.zip -d /tmp/extracted_tools
+          mkdir -p "$SDK_DIR/tools/bin"
+          cp -r /tmp/extracted_tools/cmdline-tools/* "$SDK_DIR/tools/"
+          rm -rf /tmp/cmdtools.zip /tmp/extracted_tools
         fi
 
     - name: Cache Buildozer directory
