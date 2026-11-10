@@ -40,9 +40,7 @@ jobs:
 
     - name: Initialize Buildozer config
       run: |
-        # إنشاء ملف الإعدادات افتراضياً إذا لمש يكن موجوداً
         buildozer init || true
-        # تعديل المتطلبات تلقائياً داخل إعدادات البناء
         sed -i 's/#requirements = python3,kivy/requirements = python3,kivy/' buildozer.spec
 
     - name: Build with Buildozer
@@ -50,7 +48,7 @@ jobs:
         buildozer -v android debug
 
     - name: Upload APK Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: package
         path: bin/*.apk
