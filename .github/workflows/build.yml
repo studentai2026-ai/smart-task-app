@@ -38,6 +38,14 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython==0.29.36
 
+    - name: Bypass Android SDK Licenses
+      run: |
+        mkdir -p /home/runner/.buildozer/android/platform/android-sdk/licenses
+        # كتابة بصمات التراخيص المقبولة رسمياً لمنع ظهور شاشة الموافقة
+        echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" >> /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        echo -e "\nd56f5187479451eabf01fb78af6dfcb131a648fa" >> /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+
     - name: Cache Buildozer directory
       uses: actions/cache@v3
       with:
