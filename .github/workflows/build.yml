@@ -34,7 +34,6 @@ jobs:
             libswscale-dev \
             libavformat-dev \
             libavcodec-dev \
-            zlib1g-dev \
             unzip \
             wget
         pip install --upgrade pip
@@ -47,21 +46,20 @@ jobs:
         echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" >> /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
         echo -e "\nd56f5187479451eabf01fb78af6dfcb131a648fa" >> /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
 
-    - name: Pre-install Android SDK Tools & Build-Tools (Fix aidl error)
+    - name: Correctly Install Android Commandline Tools
       run: |
         SDK_DIR="/home/runner/.buildozer/android/platform/android-sdk"
-        mkdir -p "$SDK_DIR/tools"
-        if [ ! -f "$SDK_DIR/tools/bin/sdkmanager" ]; then
+        mkdir -p "$SDK_DIR/cmdline-tools"
+        if [ ! -d "$SDK_DIR/cmdline-tools/9.0" ]; then
           echo "Downloading commandline tools..."
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O /tmp/cmdtools.zip
           unzip -q /tmp/cmdtools.zip -d /tmp/extracted_tools
-          mkdir -p "$SDK_DIR/tools/bin"
-          cp -r /tmp/extracted_tools/cmdline-tools/* "$SDK_DIR/tools/"
+          mkdir -p "$SDK_DIR/cmdline-tools/9.0"
+          cp -r /tmp/extracted_tools/cmdline-tools/* "$SDK_DIR/cmdline-tools/9.0/"
           rm -rf /tmp/cmdtools.zip /tmp/extracted_tools
         fi
         
-        # تثبيت حزم أدوات البناء و platform-tools التي تحتوي على aidl و sdkmanager
-        export PATH="$SDK_DIR/tools/bin:$PATH"
+        export PATH="$SDK_DIR/cmdline-tools/9.0/bin:$PATH"
         yes | sdkmanager --sdk_root="$SDK_DIR" "platform-tools" "build-tools;33.0.2" "platforms;android-33"
 
     - name: Cache Buildozer directory
