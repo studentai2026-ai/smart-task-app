@@ -17,7 +17,7 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install dependencies
+    - name: Install system dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y \
@@ -46,7 +46,7 @@ jobs:
         echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" >> /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
         echo -e "\nd56f5187479451eabf01fb78af6dfcb131a648fa" >> /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
 
-    - name: Correctly Install Android Commandline Tools
+    - name: Install and Fix Android Commandline Tools
       run: |
         SDK_DIR="/home/runner/.buildozer/android/platform/android-sdk"
         mkdir -p "$SDK_DIR/cmdline-tools"
@@ -59,6 +59,11 @@ jobs:
           rm -rf /tmp/cmdtools.zip /tmp/extracted_tools
         fi
         
+        # إنشاء الرابط الوهمي لحل مشكلة مسار tools القديم والجديد
+        if [ ! -e "$SDK_DIR/tools" ]; then
+          ln -s "$SDK_DIR/cmdline-tools/9.0" "$SDK_DIR/tools"
+        fi
+
         export PATH="$SDK_DIR/cmdline-tools/9.0/bin:$PATH"
         yes | sdkmanager --sdk_root="$SDK_DIR" "platform-tools" "build-tools;33.0.2" "platforms;android-33"
 
