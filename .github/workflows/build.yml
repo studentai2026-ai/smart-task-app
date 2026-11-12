@@ -66,24 +66,24 @@ jobs:
         export PATH="$SDK_DIR/cmdline-tools/9.0/bin:$PATH"
         yes | sdkmanager --sdk_root="$SDK_DIR" "platform-tools" "build-tools;33.0.2" "platforms;android-33"
 
-    - name: Cache Buildozer directory
+    - name: Cache Buildozer directory (Fresh)
       uses: actions/cache@v3
       with:
         path: |
           .buildozer
           bin/
-        key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+        key: ${{ runner.os }}-buildozer-v2-${{ hashFiles('buildozer.spec') }}
         restore-keys: |
-          ${{ runner.os }}-buildozer-
+          ${{ runner.os }}-buildozer-v2-
 
     - name: Initialize and Configure Buildozer spec
       run: |
         buildozer init || true
         sed -i 's/#requirements = python3,kivy/requirements = python3,kivy/' buildozer.spec
-        # تثبيت إصدار NDK المتوافق والمستقر تماماً لتجنب توقف التجميع
-        sed -i 's/# android.ndk =.*/android.ndk = 25b/' buildozer.spec
-        sed -i 's/# android.api =.*/android.api = 33/' buildozer.spec
-        sed -i 's/# android.minapi =.*/android.minapi = 21/' buildozer.spec
+        # فرض استخدام إصدار NDK 25b المستقر تماماً
+        sed -i 's/#android.ndk =.*/android.ndk = 25b/' buildozer.spec || echo "android.ndk = 25b" >> buildozer.spec
+        sed -i 's/#android.api =.*/android.api = 33/' buildozer.spec || echo "android.api = 33" >> buildozer.spec
+        sed -i 's/#android.minapi =.*/android.minapi = 21/' buildozer.spec || echo "android.minapi = 21" >> buildozer.spec
 
     - name: Build with Buildozer
       run: |
