@@ -59,7 +59,6 @@ jobs:
           rm -rf /tmp/cmdtools.zip /tmp/extracted_tools
         fi
         
-        # إنشاء الرابط الوهمي لحل مشكلة مسار tools القديم والجديد
         if [ ! -e "$SDK_DIR/tools" ]; then
           ln -s "$SDK_DIR/cmdline-tools/9.0" "$SDK_DIR/tools"
         fi
@@ -77,10 +76,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildozer-
 
-    - name: Initialize Buildozer config
+    - name: Initialize and Configure Buildozer spec
       run: |
         buildozer init || true
         sed -i 's/#requirements = python3,kivy/requirements = python3,kivy/' buildozer.spec
+        # تثبيت إصدار NDK المتوافق والمستقر تماماً لتجنب توقف التجميع
+        sed -i 's/# android.ndk =.*/android.ndk = 25b/' buildozer.spec
+        sed -i 's/# android.api =.*/android.api = 33/' buildozer.spec
+        sed -i 's/# android.minapi =.*/android.minapi = 21/' buildozer.spec
 
     - name: Build with Buildozer
       run: |
