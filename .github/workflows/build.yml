@@ -38,6 +38,10 @@ jobs:
             wget
         pip install --upgrade pip
         pip install buildozer cython==0.29.36
+        # زيادة مهلة جيت لضمان عدم انقطاع تحميل المستودعات الكبيرة مثل libpng
+        git config --global http.postBuffer 524288000
+        git config --global http.lowSpeedLimit 0
+        git config --global http.lowSpeedTime 999999
 
     - name: Bypass Android SDK Licenses
       run: |
@@ -66,27 +70,24 @@ jobs:
         export PATH="$SDK_DIR/cmdline-tools/9.0/bin:$PATH"
         yes | sdkmanager --sdk_root="$SDK_DIR" "platform-tools" "build-tools;33.0.2" "platforms;android-33"
 
-    - name: Cache Buildozer directory (v5 - Clean)
+    - name: Cache Buildozer directory (v6)
       uses: actions/cache@v3
       with:
         path: |
           .buildozer
           bin/
-        key: ${{ runner.os }}-buildozer-v5-${{ hashFiles('buildozer.spec') }}
+        key: ${{ runner.os }}-buildozer-v6-${{ hashFiles('buildozer.spec') }}
         restore-keys: |
-          ${{ runner.os }}-buildozer-v5-
+          ${{ runner.os }}-buildozer-v6-
 
     - name: Initialize and Configure Buildozer spec
       run: |
-        # حذف أي ملف spec قديم قد يحمل إعدادات خاطئة ومطابقة النسخة من جديد
         rm -f buildozer.spec
         buildozer init
         
-        # ضبط المتطلبات والإعدادات الأساسية بدقة
         sed -i 's/#requirements = python3,kivy/requirements = python3,kivy/' buildozer.spec
         sed -i 's/requirements = python3,kivy/requirements = python3,kivy/' buildozer.spec
         
-        # ضبط NDK وإصدارات أندرويد والمعمارية المفردة لتسريع العملية ومنع استهلاك الذاكرة
         sed -i 's/#android.ndk =.*/android.ndk = 25b/' buildozer.spec || echo "android.ndk = 25b" >> buildozer.spec
         sed -i 's/#android.api =.*/android.api = 33/' buildozer.spec || echo "android.api = 33" >> buildozer.spec
         sed -i 's/#android.minapi =.*/android.minapi = 21/' buildozer.spec || echo "android.minapi = 21" >> buildozer.spec
