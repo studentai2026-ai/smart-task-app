@@ -66,25 +66,26 @@ jobs:
         export PATH="$SDK_DIR/cmdline-tools/9.0/bin:$PATH"
         yes | sdkmanager --sdk_root="$SDK_DIR" "platform-tools" "build-tools;33.0.2" "platforms;android-33"
 
-    - name: Cache Buildozer directory (v3)
+    - name: Cache Buildozer directory (v4)
       uses: actions/cache@v3
       with:
         path: |
           .buildozer
           bin/
-        key: ${{ runner.os }}-buildozer-v3-${{ hashFiles('buildozer.spec') }}
+        key: ${{ runner.os }}-buildozer-v4-${{ hashFiles('buildozer.spec') }}
         restore-keys: |
-          ${{ runner.os }}-buildozer-v3-
+          ${{ runner.os }}-buildozer-v4-
 
     - name: Initialize and Configure Buildozer spec
       run: |
         buildozer init || true
+        # فرض استخدام بايثون 3.10 وإصدارات مستقرة لتجنب أخطاء التجميع الضخمة
         sed -i 's/#requirements = python3,kivy/requirements = python3,kivy/' buildozer.spec
         sed -i 's/#android.ndk =.*/android.ndk = 25b/' buildozer.spec || echo "android.ndk = 25b" >> buildozer.spec
         sed -i 's/#android.api =.*/android.api = 33/' buildozer.spec || echo "android.api = 33" >> buildozer.spec
         sed -i 's/#android.minapi =.*/android.minapi = 21/' buildozer.spec || echo "android.minapi = 21" >> buildozer.spec
-        # تقليل المعمارية إلى arm64-v8a فقط لتوفير الرام وتسريع البناء بشكل كبير وتجنب الأخطاء
         sed -i 's/#android.archs =.*/android.archs = arm64-v8a/' buildozer.spec || echo "android.archs = arm64-v8a" >> buildozer.spec
+        sed -i 's/#p4a.branch =.*/p4a.branch = master/' buildozer.spec || echo "p4a.branch = master" >> buildozer.spec
 
     - name: Build with Buildozer
       run: |
